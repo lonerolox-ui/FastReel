@@ -3,39 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastReel</title>
+    <title>FastReel - Fix</title>
     <style>
-        body { background: #0a0a0a; color: white; font-family: sans-serif; text-align: center; padding: 50px 20px; }
-        .box { border: 2px solid #ff003c; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 0 20px #ff003c; }
-        h1 { color: #ff003c; }
-        input { padding: 12px; width: 80%; border-radius: 10px; border: none; margin-top: 20px; }
-        button { background: #ff003c; color: white; border: none; padding: 15px 30px; border-radius: 10px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .card { border: 2px solid #ff003c; padding: 40px; border-radius: 20px; box-shadow: 0 0 20px #ff003c; width: 300px; }
+        h1 { color: #ff003c; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: none; box-sizing: border-box; }
+        #convertBtn { background: #ff003c; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        #status { margin-top: 15px; color: cyan; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <div class="box">
+
+    <div class="card">
         <h1>FastReel</h1>
-        <p>YouTube Linkini Yapıştır</p>
-        <input type="text" id="url" placeholder="https://youtube.com...">
-        <br>
-        <button id="btn">VİDEOYU DÖNÜŞTÜR</button>
-        <p id="msg" style="display:none; color:cyan;">İşlem başladı, lütfen bekle...</p>
+        <input type="text" id="videoUrl" placeholder="YouTube Linkini Yapıştır">
+        <button id="convertBtn">DÖNÜŞTÜR</button>
+        <div id="status"></div>
     </div>
 
     <script type="module">
+        // Kütüphaneyi yüklemeyi dene
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
-        document.getElementById('btn').onclick = async () => {
-            const val = document.getElementById('url').value;
-            if(!val) return alert("Link boş!");
-            document.getElementById('msg').style.display = 'block';
+
+        const btn = document.getElementById('convertBtn');
+        const status = document.getElementById('status');
+
+        // Buton tıklama olayı
+        btn.onclick = async () => {
+            const url = document.getElementById('videoUrl').value.trim();
+            
+            if(!url) {
+                alert("Lütfen önce bir link yapıştır!");
+                return;
+            }
+
+            console.log("Butona basıldı, işlem başlıyor...");
+            status.innerText = "Bağlantı kuruluyor... Lütfen bekle.";
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+
             try {
-                const app = await Client.connect("FasttReel/FastReel-Backend");
-                const res = await app.predict("/predict", [val]);
-                alert("Başarılı! Video hazır.");
-                console.log(res);
-            } catch (e) {
-                alert("Hata: " + e.message);
-                document.getElementById('msg').style.display = 'none';
+                // Backend bağlantısı
+                const client = await Client.connect("FasttReel/FastReel-Backend");
+                status.innerText = "Video işleniyor... (3-5 dakika sürebilir)";
+                
+                const result = await client.predict("/predict", [url]);
+
+                if (result.data) {
+                    alert("BAŞARILI! Video hazır.");
+                    status.innerText = "İşlem tamamlandı!";
+                    window.open(result.data[0].url, '_blank');
+                }
+            } catch (error) {
+                console.error(error);
+                alert("HATA OLUŞTU: " + error.message);
+                status.innerText = "Hata nedeniyle durdu.";
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = "1";
             }
         };
     </script>
