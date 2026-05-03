@@ -24,8 +24,9 @@
 
         /* SONUÇ ALANI */
         #result-area { display: none; margin-top: 30px; width: 100%; }
-        video { width: 100%; max-width: 200px; border-radius: 15px; border: 3px solid var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
-        .download-btn { display: inline-block; background: none; border: 2px solid var(--neon-white); color: var(--neon-white); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; text-decoration: none; }
+        video { width: 100%; max-width: 200px; border-radius: 15px; border: 3px solid var(--neon-red); box-shadow: 0 0 15px var(--neon-red); background: #000; }
+        .download-btn { display: inline-block; background: none; border: 2px solid var(--neon-white); color: var(--neon-white); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; text-decoration: none; transition: 0.3s; }
+        .download-btn:hover { background: var(--neon-white); color: #000; box-shadow: 0 0 15px var(--neon-white); }
     </style>
 </head>
 <body>
@@ -40,11 +41,11 @@
 
         <div class="ai-loader-container" id="aiLoader">
             <div class="ai-loader"></div>
-            <div class="ai-text" id="aiStatus">Yapay Zeka Analiz Ediyor...</div>
+            <div id="aiStatus" class="ai-text">Yapay Zeka Analiz Ediyor... %0</div>
         </div>
 
         <div id="result-area">
-            <h3 style="color:var(--neon-white);">Videon Hazır! ✅</h3>
+            <h3 style="color:var(--neon-white); text-shadow: 0 0 10px var(--neon-white);">Videon Hazır! ✅</h3>
             <video id="outVid" controls></video>
             <br>
             <a id="dlLink" class="download-btn" href="#" target="_blank">VİDEOYU İNDİR</a>
@@ -64,30 +65,46 @@
 
         btn.onclick = async () => {
             const url = urlInput.value.trim();
-            if(!url) return alert("Lütfen bir link gir!");
+            if(!url || (!url.includes("youtube.com") && !url.includes("youtu.be"))) {
+                alert("Lütfen geçerli bir YouTube linki yapıştırın!");
+                return;
+            }
 
+            // Arayüzü Hazırla
             loader.style.display = "flex";
             resultArea.style.display = "none";
             btn.disabled = true;
 
+            // Görsel Yüzde Sayacı Başlat (Animasyon için)
+            let percent = 0;
+            const interval = setInterval(() => {
+                percent += Math.floor(Math.random() * 5) + 1;
+                if(percent >= 99) percent = 99;
+                statusText.innerText = `Yapay Zeka Analiz Ediyor... %${percent}`;
+            }, 500);
+
             try {
-                // Hugging Face motoruna bağlanıyoruz
-                statusText.innerText = "Yapay Zeka Hazırlanıyor...";
+                // GERÇEK MOTOR BAĞLANTISI
                 const client = await Client.connect("FasttReel/FastReel-Backend");
-                
-                statusText.innerText = "Video İşleniyor... (3-5 Dakika Sürebilir)";
                 const res = await client.predict("/predict", [url]);
 
                 if (res.data && res.data[0]) {
+                    clearInterval(interval);
+                    statusText.innerText = "Yapay Zeka Analiz Ediyor... %100";
+                    
                     const videoUrl = res.data[0].url;
                     outVid.src = videoUrl;
                     dlLink.href = videoUrl;
                     
-                    loader.style.display = "none";
-                    resultArea.style.display = "block";
+                    setTimeout(() => {
+                        loader.style.display = "none";
+                        resultArea.style.display = "block";
+                        resultArea.scrollIntoView({ behavior: 'smooth' });
+                    }, 800);
                 }
             } catch (e) {
-                alert("Bağlantı Hatası: " + e.message + "\nLütfen motorun 'Running' olduğundan emin ol!");
+                clearInterval(interval);
+                alert("Bağlantı Hatası: " + e.message + "\nLütfen Hugging Face sayfanın 'Running' olduğundan emin ol!");
                 loader.style.display = "none";
             } finally {
                 btn.disabled = false;
