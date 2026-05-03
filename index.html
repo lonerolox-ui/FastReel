@@ -6,40 +6,41 @@
     <title>FastReel - YouTube to Shorts</title>
     <style>
         :root { --neon-red: #ff003c; --bg-black: #0a0a0a; }
-        body { background-color: var(--bg-black); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { max-width: 400px; width: 90%; background: #111; padding: 40px 20px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.15); margin-top: 50px; }
-        .logo-circle { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-red); box-shadow: 0 0 20px var(--neon-red); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; background: #000; }
-        h1 { color: var(--neon-red); font-size: 2rem; text-shadow: 0 0 15px var(--neon-red); }
-        input[type="text"] { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; margin-top: 20px; box-sizing: border-box; }
-        .btn { background: var(--neon-red); color: white; padding: 15px 0; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 93%; font-size: 1.1rem; margin-top: 20px; box-shadow: 0 0 20px var(--neon-red); }
-        #result-container { display: none; margin-top: 30px; width: 100%; }
-        video { width: 100%; border-radius: 15px; border: 2px solid var(--neon-red); }
-        .download-btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: #fff; color: #000; text-decoration: none; border-radius: 8px; font-weight: bold; }
-        .ai-loader-container { display: none; flex-direction: column; align-items: center; margin-top: 20px; }
-        .ai-loader { width: 50px; height: 50px; border-radius: 50%; border: 5px solid transparent; border-top-color: var(--neon-red); animation: spin 1s linear infinite; }
+        body { background-color: var(--bg-black); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { max-width: 400px; width: 95%; background: #111; padding: 40px 10px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.15); margin-top: 50px; }
+        .logo-circle { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-red); box-shadow: 0 0 20px var(--neon-red); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; background: #000; font-weight: bold; font-size: 1.5rem; }
+        h1 { color: var(--neon-red); font-size: 2.2rem; text-shadow: 0 0 15px var(--neon-red); margin-bottom: 5px; }
+        input { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; margin-top: 20px; text-align: center; }
+        .btn { background: var(--neon-red); color: white; padding: 15px 0; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 85%; font-size: 1.1rem; margin-top: 20px; box-shadow: 0 0 15px var(--neon-red); transition: 0.3s; }
+        .btn:active { transform: scale(0.95); }
+        #loader { display: none; margin-top: 20px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--neon-red); border-radius: 50%; animation: spin 1s linear infinite; margin: 10px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #result { display: none; margin-top: 30px; width: 100%; }
+        video { width: 90%; border-radius: 15px; border: 2px solid var(--neon-red); background: #000; }
+        .dl-btn { display: inline-block; margin-top: 15px; padding: 12px 25px; background: white; color: black; text-decoration: none; border-radius: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="logo-circle"><b style="font-size: 1.5rem;">FR</b></div>
+        <div class="logo-circle">FR</div>
         <h1>FastReel</h1>
-        <p style="color:#888;">YouTube linkini gir ve dönüştür!</p>
+        <p style="color:#777; font-size: 0.9rem;">Hugging Face Altyapısı ile Çalışır</p>
         
-        <input type="text" id="videoUrl" placeholder="https://youtube.com/watch?v=...">
-        <button class="btn" id="convertBtn">DÖNÜŞTÜR</button>
+        <input type="text" id="videoUrl" placeholder="YouTube Linkini Buraya Yapıştır">
+        <button class="btn" id="convertBtn">VİDEOYU DÖNÜŞTÜR</button>
 
-        <div class="ai-loader-container" id="loader">
-            <div class="ai-loader"></div>
-            <p style="color:var(--neon-red); font-weight:bold; margin-top:10px;">YAPAY ZEKA ÇALIŞIYOR...<br>LÜTFEN BEKLEYİN.</p>
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="color:var(--neon-red);">Yapay Zeka İşliyor... <br><small>3-5 dakika sürebilir, sayfayı kapatma.</small></p>
         </div>
 
-        <div id="result-container">
-            <h3 style="color:lawngreen;">İŞLEM TAMAM! ✅</h3>
-            <video id="outputVideo" controls></video>
+        <div id="result">
+            <h3 style="color:lawngreen;">Videon Hazır! 🎥</h3>
+            <video id="outVid" controls></video>
             <br>
-            <a id="downloadBtn" class="download-btn" href="#" target="_blank">VİDEOYU İNDİR</a>
+            <a id="dlLink" class="dl-btn" href="#" target="_blank">Telefona İndir</a>
         </div>
     </div>
 
@@ -47,45 +48,41 @@
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
 
         const btn = document.getElementById('convertBtn');
+        const input = document.getElementById('videoUrl');
         const loader = document.getElementById('loader');
-        const result = document.getElementById('result-container');
+        const result = document.getElementById('result');
 
-        btn.addEventListener('click', async () => {
-            let url = document.getElementById('videoUrl').value.trim();
+        btn.onclick = async () => {
+            const url = input.value.trim();
+            if(!url) return alert("Lütfen bir link gir!");
 
-            if(!url) {
-                alert("Önce bir link yapıştırmalısın!");
-                return;
-            }
-
-            console.log("Dönüştürme başladı...");
+            // Görünümü hazırla
             btn.style.display = 'none';
-            loader.style.display = 'flex';
+            loader.style.display = 'block';
             result.style.display = 'none';
 
             try {
-                // Bağlantıyı kur (Hugging Face Adresin: FasttReel/FastReel-Backend)
-                const client = await Client.connect("FasttReel/FastReel-Backend");
-                const prediction = await client.predict("/predict", [url]);
+                // Hugging Face bağlantısı
+                const app = await Client.connect("FasttReel/FastReel-Backend");
+                const res = await app.predict("/predict", [url]);
 
-                if (prediction.data && prediction.data[0]) {
-                    const videoUrl = prediction.data[0].url;
-                    document.getElementById('outputVideo').src = videoUrl;
-                    document.getElementById('downloadBtn').href = videoUrl;
-                    
+                if (res.data && res.data[0]) {
+                    const videoUrl = res.data[0].url;
+                    document.getElementById('outVid').src = videoUrl;
+                    document.getElementById('dlLink').href = videoUrl;
+
                     loader.style.display = 'none';
                     result.style.display = 'block';
                     btn.style.display = 'block';
-                    btn.innerText = "BAŞKA BİR VİDEO DÖNÜŞTÜR";
+                    btn.innerText = "BİR TANE DAHA YAP";
                 }
-
-            } catch (error) {
-                console.error(error);
-                alert("Üzgünüm, bir hata oluştu: " + error.message);
+            } catch (err) {
+                console.error(err);
+                alert("HATA: " + err.message);
                 loader.style.display = 'none';
                 btn.style.display = 'block';
             }
-        });
+        };
     </script>
 </body>
 </html>
