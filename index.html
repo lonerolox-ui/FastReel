@@ -14,15 +14,11 @@
         .container { max-width: 400px; width: 90%; background: #111; padding: 40px 20px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.15); position: relative; margin-top: 50px; }
         .logo-circle { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon-red); box-shadow: 0 0 20px var(--neon-red); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; background: #000; }
         h1 { color: var(--neon-red); font-size: 2rem; text-shadow: 0 0 15px var(--neon-red); }
-        input[type="text"] { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; margin-top: 20px; }
+        input[type="text"] { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; margin-top: 20px; box-sizing: border-box; }
         .btn { background: var(--neon-red); color: white; padding: 15px 0; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 93%; font-size: 1.1rem; margin-top: 20px; box-shadow: 0 0 20px var(--neon-red); }
-        
-        /* Video Sonuç Alanı */
         #result-container { display: none; margin-top: 30px; width: 100%; text-align: center; }
         video { width: 100%; border-radius: 15px; border: 2px solid var(--neon-red); box-shadow: 0 0 20px rgba(255, 0, 60, 0.3); }
         .download-btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: #fff; color: #000; text-decoration: none; border-radius: 8px; font-weight: bold; }
-
-        /* Yükleme Ekranı */
         .ai-loader-container { display: none; flex-direction: column; align-items: center; margin-top: 20px; }
         .ai-loader { width: 50px; height: 50px; border-radius: 50%; border: 5px solid transparent; border-top-color: var(--neon-red); animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -34,63 +30,3 @@
         <div class="logo-circle"><b style="font-size: 1.5rem;">FR</b></div>
         <h1>FastReel</h1>
         <p style="color:#888;">Başka siteye gitmeden dikey videona ulaş!</p>
-        
-        <input type="text" id="videoUrl" placeholder="YouTube Linkini Yapıştır...">
-        <button class="btn" id="convertBtn" onclick="donustur()">DÖNÜŞTÜR</button>
-
-        <div class="ai-loader-container" id="loader">
-            <div class="ai-loader"></div>
-            <p id="statusText" style="color:var(--neon-red); font-weight:bold; margin-top:10px;">VİDEO HAZIRLANIYOR... (2-3 DK SÜREBİLİR)</p>
-        </div>
-
-        <div id="result-container">
-            <h3 style="color:lawngreen;">VİDEON HAZIR! ✅</h3>
-            <video id="outputVideo" controls></video>
-            <br>
-            <a id="downloadBtn" class="download-btn" download="fastreel_shorts.mp4">TELEFONA İNDİR</a>
-        </div>
-    </div>
-
-    <script>
-        async function donustur() {
-            const url = document.getElementById('videoUrl').value;
-            const loader = document.getElementById('loader');
-            const result = document.getElementById('result-container');
-            const btn = document.getElementById('convertBtn');
-
-            if(!url) return alert("Link gir!");
-
-            // Görünümü ayarla
-            btn.style.display = 'none';
-            loader.style.display = 'flex';
-            result.style.display = 'none';
-
-            try {
-                // Hugging Face motoruna gizli bağlantı kuruyoruz
-                const client = await window.GradioClient.connect("FasttReel/FastReel-Backend");
-                const prediction = await client.predict("/predict", [url]);
-
-                // Gelen video linkini al
-                const videoUrl = prediction.data[0].url;
-
-                // Videoyu ekranda göster
-                const videoElement = document.getElementById('outputVideo');
-                videoElement.src = videoUrl;
-                document.getElementById('downloadBtn').href = videoUrl;
-
-                // Arayüzü güncelle
-                loader.style.display = 'none';
-                result.style.display = 'block';
-                btn.style.display = 'block';
-                btn.innerText = "YENİ VİDEO DÖNÜŞTÜR";
-
-            } catch (e) {
-                console.error(e);
-                alert("Hata oluştu! Motorun 'Running' olduğundan emin ol.");
-                loader.style.display = 'none';
-                btn.style.display = 'block';
-            }
-        }
-    </script>
-</body>
-</html>
