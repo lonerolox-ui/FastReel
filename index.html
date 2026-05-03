@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FastReel - YouTube to Shorts</title>
-    <script type="module">
-        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
-        window.GradioClient = Client;
-    </script>
     <style>
         :root { --neon-red: #ff003c; --bg-black: #0a0a0a; }
         body { background-color: var(--bg-black); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -29,14 +25,14 @@
     <div class="container">
         <div class="logo-circle"><b style="font-size: 1.5rem;">FR</b></div>
         <h1>FastReel</h1>
-        <p style="color:#888;">YouTube linkini yapıştır, dikey videon hazır gelsin!</p>
+        <p style="color:#888;">Video linkini yapıştır, gerisini yapay zekaya bırak!</p>
         
         <input type="text" id="videoUrl" placeholder="YouTube Linkini Yapıştır...">
         <button class="btn" id="convertBtn" onclick="donustur()">DÖNÜŞTÜR</button>
 
         <div class="ai-loader-container" id="loader">
             <div class="ai-loader"></div>
-            <p style="color:var(--neon-red); font-weight:bold; margin-top:10px;">VİDEO İŞLENİYOR... (3-5 DK SÜREBİLİR)</p>
+            <p style="color:var(--neon-red); font-weight:bold; margin-top:10px;">VİDEO HAZIRLANIYOR...<br>BU İŞLEM BİRAZ SÜREBİLİR.</p>
         </div>
 
         <div id="result-container">
@@ -47,16 +43,18 @@
         </div>
     </div>
 
-    <script>
-        async function donustur() {
+    <script type="module">
+        // Kütüphaneyi doğrudan buradan çağırıyoruz ki "undefined" demesin
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
+
+        window.donustur = async function() {
             let url = document.getElementById('videoUrl').value.trim();
             const loader = document.getElementById('loader');
             const result = document.getElementById('result-container');
             const btn = document.getElementById('convertBtn');
 
-            if(!url) return alert("Lütfen bir YouTube linki yapıştırın!");
+            if(!url) return alert("Lütfen bir link girin!");
             
-            // Mobil linkleri düzeltme (m.youtube.com -> youtube.com)
             url = url.replace("m.youtube.com", "youtube.com");
 
             btn.style.display = 'none';
@@ -64,8 +62,8 @@
             result.style.display = 'none';
 
             try {
-                // BAĞLANTI DENEMESİ
-                const client = await window.GradioClient.connect("FasttReel/FastReel-Backend");
+                // Uzay adresi ve kullanıcı adı kontrol edildi: FasttReel/FastReel-Backend
+                const client = await Client.connect("FasttReel/FastReel-Backend");
                 const prediction = await client.predict("/predict", [url]);
 
                 const videoUrl = prediction.data[0].url;
@@ -76,9 +74,11 @@
                 loader.style.display = 'none';
                 result.style.display = 'block';
                 btn.style.display = 'block';
+                btn.innerText = "YENİ VİDEO DÖNÜŞTÜR";
+
             } catch (e) {
                 console.error(e);
-                alert("BAĞLANTI HATASI: " + e.message + "\n\nNot: Hugging Face sayfasının yeşil 'Running' olduğundan emin ol!");
+                alert("BAĞLANTI SORUNU: " + e.message);
                 loader.style.display = 'none';
                 btn.style.display = 'block';
             }
