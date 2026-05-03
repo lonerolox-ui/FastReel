@@ -3,70 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastReel - Manuel Edit</title>
+    <title>FastReel - Kontrol Sende</title>
     <style>
-        :root { --neon-red: #ff003c; --bg-black: #0a0a0a; --neon-white: #ffffff; }
-        body { background-color: var(--bg-black); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        
-        .container { max-width: 450px; width: 95%; background: #111; padding: 30px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.2); }
-        
-        h1 { color: var(--neon-red); text-shadow: 0 0 15px var(--neon-red); margin-bottom: 5px; }
-        p { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
-
-        /* GİRİŞ ALANLARI */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 0.8rem; color: var(--neon-red); margin-bottom: 5px; margin-left: 10px; font-weight: bold; }
-        input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
-
-        .time-inputs { display: flex; gap: 10px; }
-        .time-inputs div { flex: 1; }
-
-        /* BUTON */
-        .btn { background: var(--neon-red); color: white; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; margin-top: 10px; box-shadow: 0 0 20px var(--neon-red); transition: 0.3s; }
-        .btn:hover { transform: scale(1.02); background: #d00030; }
-        .btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
-
-        /* YÜKLEME VE SONUÇ */
-        #status { display: none; margin-top: 20px; color: var(--neon-red); font-weight: bold; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        #result { display: none; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; }
-        video { width: 100%; border-radius: 15px; border: 2px solid var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
-        .dl-link { display: inline-block; margin-top: 15px; color: white; text-decoration: none; border: 1px solid white; padding: 8px 20px; border-radius: 8px; font-size: 0.9rem; }
+        :root { --neon: #ff003c; --bg: #0a0a0a; }
+        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .panel { max-width: 400px; margin: auto; background: #111; padding: 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 0 25px rgba(255, 0, 60, 0.2); }
+        h1 { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 2px solid #333; background: #000; color: white; box-sizing: border-box; }
+        input:focus { border-color: var(--neon); outline: none; }
+        .row { display: flex; gap: 10px; }
+        .btn { background: var(--neon); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--neon); margin-top: 10px; }
+        #status { margin-top: 20px; color: #888; font-size: 14px; display: none; }
+        #result { display: none; margin-top: 20px; }
+        video { width: 100%; border-radius: 15px; border: 2px solid var(--neon); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>FastReel AI</h1>
-        <p>Linki yapıştır, süreyi seç, altyazın eklensin!</p>
-
-        <div class="input-group">
-            <label>YOUTUBE VİDEO LİNKİ</label>
-            <input type="text" id="videoUrl" placeholder="https://youtube.com/watch?v=...">
+    <div class="panel">
+        <h1>FastReel V2</h1>
+        <p>Kontrolü eline al, videonu yarat!</p>
+        
+        <input type="text" id="url" placeholder="YouTube Video Linki">
+        
+        <div class="row">
+            <input type="number" id="start" placeholder="Başla (sn)" value="0">
+            <input type="number" id="end" placeholder="Bitir (sn)" value="30">
         </div>
 
-        <div class="time-inputs">
-            <div class="input-group">
-                <label>BAŞLANGIÇ (SN)</label>
-                <input type="number" id="startTime" placeholder="Örn: 10" value="0">
-            </div>
-            <div class="input-group">
-                <label>BİTİŞ (SN)</label>
-                <input type="number" id="endTime" placeholder="Örn: 40" value="30">
-            </div>
-        </div>
+        <button id="workBtn" class="btn">VİDEOYU OLUŞTUR</button>
 
-        <button class="btn" id="workBtn">VİDEOYU OLUŞTUR VE ALTYAZI EKLE</button>
-
-        <div id="status">Yapay Zeka İşlem Yapıyor... <br> (Bu işlem 2-4 dakika sürebilir)</div>
+        <div id="status">🚀 Yapay Zeka videonu işliyor... <br> (Süreye göre 2-3 dakika sürebilir)</div>
 
         <div id="result">
-            <h3 style="color:var(--neon-white);">Videon Hazır! ✅</h3>
-            <video id="outputVideo" controls></video>
-            <br>
-            <a id="downloadLink" class="dl-link" href="#" target="_blank">Telefona İndir</a>
+            <video id="vid" controls></video>
+            <p>✅ Video Hazır!</p>
         </div>
     </div>
 
@@ -78,39 +49,33 @@
         const result = document.getElementById('result');
 
         btn.onclick = async () => {
-            const url = document.getElementById('videoUrl').value.trim();
-            const start = document.getElementById('startTime').value;
-            const end = document.getElementById('endTime').value;
+            const urlVal = document.getElementById('url').value;
+            const startVal = document.getElementById('start').value;
+            const endVal = document.getElementById('end').value;
 
-            if(!url) return alert("Lütfen bir link gir!");
-            if(parseInt(end) <= parseInt(start)) return alert("Bitiş süresi başlangıçtan büyük olmalıdır!");
+            if(!urlVal) return alert("Linki unutma!");
 
             btn.disabled = true;
             status.style.display = "block";
             result.style.display = "none";
 
             try {
-                // Hugging Face Backend Bağlantısı
-                // NOT: Backend'in bu 3 parametreyi (url, start, end) kabul edecek şekilde güncellenmiş olması gerekir.
+                // Burada 3 parametre gönderiyoruz: [url, start, end]
                 const app = await Client.connect("FasttReel/FastReel-Backend");
-                const prediction = await app.predict("/predict", [url, start, end]);
+                const prediction = await app.predict("/predict", [urlVal, startVal, endVal]);
 
                 if (prediction.data) {
-                    const videoUrl = prediction.data[0].url;
-                    document.getElementById('outputVideo').src = videoUrl;
-                    document.getElementById('downloadLink').href = videoUrl;
-
+                    document.getElementById('vid').src = prediction.data[0].url;
                     status.style.display = "none";
                     result.style.display = "block";
                 }
             } catch (err) {
-                alert("Hata oluştu: " + err.message);
+                alert("Hata: " + err.message);
                 status.style.display = "none";
             } finally {
                 btn.disabled = false;
             }
         };
     </script>
-
 </body>
 </html>
