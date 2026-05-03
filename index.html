@@ -78,4 +78,55 @@
             <div class="shorts-player">
                 <div class="neon-border-draw"></div>
                 <div class="video-placeholder-text">Shorts Videosu Önizlemesi</div>
-                <div style
+                <div style="color:var(--neon-red); font-weight:bold; font-size:1.2rem; margin-top:10px;">[DEMO]</div>
+            </div>
+            <button class="download-btn">Kırpılmış Videoyu İndir</button>
+        </div>
+    </div>
+
+    <script>
+        // Logo resmi yüklenirse yazıyı gizle
+        window.onload = function() {
+            var img = document.querySelector('.logo-circle img');
+            var text = document.getElementById('fr-fallback');
+            if (img && img.complete && img.naturalWidth !== 0) { text.style.display = 'none'; }
+            img.onload = function() { text.style.display = 'none'; };
+        };
+
+        function startAI() {
+            var url = document.getElementById('urlInput').value;
+            if(url === "" || (!url.includes("youtube.com") && !url.includes("youtu.be"))) { alert("Lütfen geçerli bir YouTube linki yapıştırın!"); return; }
+            
+            var loader = document.getElementById('aiLoader');
+            var statusText = document.getElementById('aiStatus');
+            var resultArea = document.getElementById('result-area');
+            
+            // Yükleme ekranını göster, eski sonucu gizle
+            loader.style.display = "flex";
+            resultArea.style.display = "none";
+
+            var count = 0;
+            var interval = setInterval(function() {
+                count += Math.floor(Math.random() * 8) + 1;
+                if(count >= 100) {
+                    count = 100;
+                    statusText.innerText = "Yapay Zeka Analiz Ediyor... %" + count;
+                    clearInterval(interval);
+                    
+                    // İşlem bitti, yükleme ekranını gizle, sonucu göster
+                    setTimeout(function(){
+                        loader.style.display = "none";
+                        resultArea.style.display = "block";
+                        // Videoyu gösterdiğimiz alana yumuşak geçiş yap
+                        resultArea.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+
+                } else {
+                    statusText.innerText = "Yapay Zeka Analiz Ediyor... %" + count;
+                }
+            }, 300);
+        }
+    </script>
+
+</body>
+</html>
