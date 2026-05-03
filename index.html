@@ -1,92 +1,28 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastReel V2 - Manuel Edit</title>
-    <style>
-        :root { --neon: #ff003c; --bg: #0a0a0a; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        .container { max-width: 400px; width: 90%; background: #111; padding: 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 0 25px rgba(255, 0, 60, 0.2); }
-        h1 { color: var(--neon); text-shadow: 0 0 10px var(--neon); margin: 0; }
-        p { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 2px solid #333; background: #000; color: white; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--neon); }
-        .row { display: flex; gap: 10px; }
-        .btn { background: var(--neon); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--neon); margin-top: 10px; transition: 0.3s; }
-        .btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
-        #status { margin-top: 20px; color: var(--neon); font-size: 14px; display: none; font-weight: bold; }
-        #result { display: none; margin-top: 20px; }
-        video { width: 100%; border-radius: 15px; border: 2px solid var(--neon); box-shadow: 0 0 15px var(--neon); }
-    </style>
-</head>
-<body>
+<script type="module">
+    import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
 
-    <div class="container">
-        <h1>FastReel V2</h1>
-        <p>Saniyeni seç, videonu oluştur!</p>
-        
-        <input type="text" id="url" placeholder="YouTube Linkini Yapıştır">
-        
-        <div class="row">
-            <div>
-                <label style="font-size: 10px; color: var(--neon);">BAŞLA (SN)</label>
-                <input type="number" id="start" value="0">
-            </div>
-            <div>
-                <label style="font-size: 10px; color: var(--neon);">BİTİR (SN)</label>
-                <input type="number" id="end" value="30">
-            </div>
-        </div>
+    const btn = document.getElementById('workBtn');
+    
+    btn.onclick = async () => {
+        console.log("Butona basıldı!"); // Tarayıcı konsoluna yazar
+        alert("İşlem başlıyor, lütfen bekleyin..."); // Ekranda uyarı çıkartır
 
-        <button id="workBtn" class="btn">VİDEOYU OLUŞTUR</button>
+        const urlVal = document.getElementById('url').value.trim();
+        const startVal = document.getElementById('start').value;
+        const endVal = document.getElementById('end').value;
 
-        <div id="status">🎬 Yapay Zeka Videonu İşliyor... <br> (2-3 Dakika Sürebilir)</div>
+        try {
+            // BURAYI KENDİ SPACE ADRESİNLE DEĞİŞTİR:
+            const app = await Client.connect("FasttReel/FastReel-Backend1");
+            const prediction = await app.predict("/predict", [urlVal, startVal, endVal]);
 
-        <div id="result">
-            <video id="vid" controls></video>
-            <p style="color: lime;">✅ Video Hazır!</p>
-        </div>
-    </div>
-
-    <script type="module">
-        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
-
-        const btn = document.getElementById('workBtn');
-        const status = document.getElementById('status');
-        const result = document.getElementById('result');
-
-        btn.onclick = async () => {
-            const urlVal = document.getElementById('url').value.trim();
-            const startVal = document.getElementById('start').value;
-            const endVal = document.getElementById('end').value;
-
-            if(!urlVal) return alert("Lütfen YouTube linkini gir!");
-
-            btn.disabled = true;
-            status.style.display = "block";
-            result.style.display = "none";
-
-            try {
-                // DOĞRUDAN SENİN ADRESİNİ YAZDIM:
-                const app = await Client.connect("FasttReel/FastReel-Backend1");
-                
-                // Arka plandaki Python fonksiyonuna 3 veriyi de gönderiyoruz
-                const prediction = await app.predict("/predict", [urlVal, startVal, endVal]);
-
-                if (prediction.data) {
-                    document.getElementById('vid').src = prediction.data[0].url;
-                    status.style.display = "none";
-                    result.style.display = "block";
-                    result.scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (err) {
-                alert("Bağlantı Hatası: " + err.message + "\nHugging Face'in 'Running' olduğundan emin ol!");
-                status.style.display = "none";
-            } finally {
-                btn.disabled = false;
+            if (prediction.data) {
+                document.getElementById('vid').src = prediction.data[0].url;
+                alert("Video hazır!");
             }
-        };
-    </script>
-</body>
-</html>
+        } catch (err) {
+            console.error(err);
+            alert("BAĞLANTI HATASI: " + err.message);
+        }
+    };
+</script>
