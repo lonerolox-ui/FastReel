@@ -59,8 +59,27 @@
             result.style.display = 'none';
 
             try {
-                // Hugging Face adresin: FasttReel/FastReel-Backend
+                // Hugging Face motorunun adresi
                 const client = await Client.connect("FasttReel/FastReel-Backend");
                 const res = await client.predict("/predict", [url]);
 
-                if (res.data &&
+                if (res.data && res.data[0]) {
+                    const videoUrl = res.data[0].url;
+                    document.getElementById('outVid').src = videoUrl;
+                    document.getElementById('dlBtn').href = videoUrl;
+
+                    loader.style.display = 'none';
+                    result.style.display = 'block';
+                    btn.style.display = 'block';
+                    btn.innerText = "YENİ VİDEO YAP";
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Bağlantı Hatası: " + e.message);
+                loader.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>
