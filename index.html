@@ -2,55 +2,115 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>FastReel FIX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastReel - Manuel Edit</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { border: 2px solid #ff003c; padding: 30px; border-radius: 20px; text-align: center; width: 300px; box-shadow: 0 0 20px #ff003c; }
-        input { width: 100%; padding: 10px; margin: 20px 0; border-radius: 8px; border: none; box-sizing: border-box; }
-        button { background: #ff003c; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #555; }
-        #status { margin-top: 15px; color: cyan; font-size: 14px; }
+        :root { --neon-red: #ff003c; --bg-black: #0a0a0a; --neon-white: #ffffff; }
+        body { background-color: var(--bg-black); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        
+        .container { max-width: 450px; width: 95%; background: #111; padding: 30px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.2); }
+        
+        h1 { color: var(--neon-red); text-shadow: 0 0 15px var(--neon-red); margin-bottom: 5px; }
+        p { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
+
+        /* GİRİŞ ALANLARI */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 0.8rem; color: var(--neon-red); margin-bottom: 5px; margin-left: 10px; font-weight: bold; }
+        input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+
+        .time-inputs { display: flex; gap: 10px; }
+        .time-inputs div { flex: 1; }
+
+        /* BUTON */
+        .btn { background: var(--neon-red); color: white; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; margin-top: 10px; box-shadow: 0 0 20px var(--neon-red); transition: 0.3s; }
+        .btn:hover { transform: scale(1.02); background: #d00030; }
+        .btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
+
+        /* YÜKLEME VE SONUÇ */
+        #status { display: none; margin-top: 20px; color: var(--neon-red); font-weight: bold; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        #result { display: none; margin-top: 25px; border-top: 1px solid #333; padding-top: 20px; }
+        video { width: 100%; border-radius: 15px; border: 2px solid var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
+        .dl-link { display: inline-block; margin-top: 15px; color: white; text-decoration: none; border: 1px solid white; padding: 8px 20px; border-radius: 8px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>FastReel</h2>
-        <input type="text" id="urlInput" placeholder="YouTube Linkini Yapıştır">
-        <button id="goBtn">VİDEOYU YAP</button>
-        <div id="status">Hazır.</div>
+
+    <div class="container">
+        <h1>FastReel AI</h1>
+        <p>Linki yapıştır, süreyi seç, altyazın eklensin!</p>
+
+        <div class="input-group">
+            <label>YOUTUBE VİDEO LİNKİ</label>
+            <input type="text" id="videoUrl" placeholder="https://youtube.com/watch?v=...">
+        </div>
+
+        <div class="time-inputs">
+            <div class="input-group">
+                <label>BAŞLANGIÇ (SN)</label>
+                <input type="number" id="startTime" placeholder="Örn: 10" value="0">
+            </div>
+            <div class="input-group">
+                <label>BİTİŞ (SN)</label>
+                <input type="number" id="endTime" placeholder="Örn: 40" value="30">
+            </div>
+        </div>
+
+        <button class="btn" id="workBtn">VİDEOYU OLUŞTUR VE ALTYAZI EKLE</button>
+
+        <div id="status">Yapay Zeka İşlem Yapıyor... <br> (Bu işlem 2-4 dakika sürebilir)</div>
+
+        <div id="result">
+            <h3 style="color:var(--neon-white);">Videon Hazır! ✅</h3>
+            <video id="outputVideo" controls></video>
+            <br>
+            <a id="downloadLink" class="dl-link" href="#" target="_blank">Telefona İndir</a>
+        </div>
     </div>
 
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
 
-        const btn = document.getElementById('goBtn');
+        const btn = document.getElementById('workBtn');
         const status = document.getElementById('status');
+        const result = document.getElementById('result');
 
         btn.onclick = async () => {
-            const url = document.getElementById('urlInput').value.trim();
-            if(!url) return alert("Link gir!");
+            const url = document.getElementById('videoUrl').value.trim();
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+
+            if(!url) return alert("Lütfen bir link gir!");
+            if(parseInt(end) <= parseInt(start)) return alert("Bitiş süresi başlangıçtan büyük olmalıdır!");
 
             btn.disabled = true;
-            status.innerText = "Yapay Zekaya Bağlanıyor...";
+            status.style.display = "block";
+            result.style.display = "none";
 
             try {
-                // Arka plandaki motorla bağlantı kuruyoruz
+                // Hugging Face Backend Bağlantısı
+                // NOT: Backend'in bu 3 parametreyi (url, start, end) kabul edecek şekilde güncellenmiş olması gerekir.
                 const app = await Client.connect("FasttReel/FastReel-Backend");
-                status.innerText = "Video İşleniyor (3-5 dk)...";
-                
-                const result = await app.predict("/predict", [url]);
+                const prediction = await app.predict("/predict", [url, start, end]);
 
-                if(result.data) {
-                    status.innerText = "BAŞARILI!";
-                    window.open(result.data[0].url, '_blank');
+                if (prediction.data) {
+                    const videoUrl = prediction.data[0].url;
+                    document.getElementById('outputVideo').src = videoUrl;
+                    document.getElementById('downloadLink').href = videoUrl;
+
+                    status.style.display = "none";
+                    result.style.display = "block";
                 }
             } catch (err) {
-                alert("HATA: " + err.message);
-                status.innerText = "Hata oluştu.";
+                alert("Hata oluştu: " + err.message);
+                status.style.display = "none";
             } finally {
                 btn.disabled = false;
             }
         };
     </script>
+
 </body>
 </html>
