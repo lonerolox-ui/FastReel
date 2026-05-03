@@ -7,126 +7,93 @@
     <style>
         :root { --neon-red: #ff003c; --bg-black: #0a0a0a; --neon-white: #ffffff; }
         body { background-color: var(--bg-black); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
-        
-        /* ANA KONTEYNER */
         .container { max-width: 400px; width: 90%; background: #111; padding: 40px 20px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 0 30px rgba(255, 0, 60, 0.15); position: relative; }
-        
-        /* LOGO ALANI */
         .logo-circle { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--neon-red); box-shadow: 0 0 20px var(--neon-red); margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
         .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
         .fr-text { color:white; font-weight:bold; font-size: 1.5rem; }
-
         h1 { color: var(--neon-red); font-size: 2.5rem; text-shadow: 0 0 15px var(--neon-red); margin: 0; }
         p { color: #888; font-size: 0.9rem; margin-top: 10px; margin-bottom: 30px; }
-
-        /* GİRİŞ ALANLARI */
-        .input-area { width: 100%; margin-bottom: 20px; text-align: center; }
-        input[type="text"] { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; font-size: 1rem; transition: 0.3s; margin: 0 auto; display: block; }
+        input[type="text"] { width: 85%; padding: 15px; border-radius: 12px; border: 2px solid #333; background: #000; color: white; outline: none; font-size: 1rem; transition: 0.3s; margin: 0 auto 20px auto; display: block; }
         input[type="text"]:focus { border-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+        .btn { background: var(--neon-red); color: white; padding: 15px 0; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 93%; font-size: 1.1rem; box-shadow: 0 0 20px var(--neon-red); transition: 0.3s; }
+        .btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
 
-        /* BUTON VE NEON GÖLGESİ */
-        .btn-container { position: relative; width: 100%; display: flex; justify-content: center; margin-top: 10px; }
-        .btn { background: var(--neon-red); color: white; padding: 15px 0; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; width: 93%; font-size: 1.1rem; border: 2px solid transparent; box-shadow: 0 0 20px var(--neon-red); transition: 0.3s; position: relative; z-index: 2; }
-        .btn:hover { transform: scale(1.03); background: #d00030; }
-
-        /* --- YENİ: YUVARLAK YÜKLEME EKRANI (AI SİMGESİ) --- */
+        /* YÜKLEME EKRANI */
         .ai-loader-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.95); border-radius: 30px; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
-        .ai-loader { width: 100px; height: 100px; border-radius: 50%; border: 5px solid transparent; border-top-color: var(--neon-red); border-bottom-color: var(--neon-red); animation: ai-spin 1.5s linear infinite; box-shadow: 0 0 30px var(--neon-red); position: relative; }
-        .ai-loader::after { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border-radius: 50%; border: 5px solid transparent; border-left-color: var(--neon-white); border-right-color: var(--neon-white); animation: ai-spin 1s linear infinite reverse; }
-        .ai-text { color: var(--neon-red); margin-top: 20px; font-weight: bold; text-shadow: 0 0 10px var(--neon-red); font-size: 1.1rem; }
-
+        .ai-loader { width: 100px; height: 100px; border-radius: 50%; border: 5px solid transparent; border-top-color: var(--neon-red); border-bottom-color: var(--neon-red); animation: ai-spin 1.5s linear infinite; box-shadow: 0 0 30px var(--neon-red); }
         @keyframes ai-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .ai-text { color: var(--neon-red); margin-top: 20px; font-weight: bold; }
 
-        /* --- YENİ: SHORTS VİDEO ÖNİZLEME ALANI (SİMÜLASYON) --- */
-        #result-area { display: none; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; width: 100%; }
-        .shorts-player { width: 200px; height: 355px; background: #000; border-radius: 15px; border: 4px solid #222; margin: 0 auto; box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .video-placeholder-text { color: #555; font-size: 0.8rem; font-style: italic; }
-        .neon-border-draw { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--neon-red); border-radius: 15px; box-shadow: 0 0 15px var(--neon-red); animation: border-draw 2s infinite linear; }
-
-        @keyframes border-draw { 0%, 100% { clip-path: inset(0 0 98% 0); } 25% { clip-path: inset(0 98% 0 0); } 50% { clip-path: inset(98% 0 0 0); } 75% { clip-path: inset(0 0 0 98%); } }
-
-        .download-btn { background: none; border: 2px solid var(--neon-white); color: var(--neon-white); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; font-size: 0.9rem; }
-        .download-btn:hover { background: var(--neon-white); color: #000; box-shadow: 0 0 15px var(--neon-white); }
+        /* SONUÇ ALANI */
+        #result-area { display: none; margin-top: 30px; width: 100%; }
+        video { width: 200px; height: 355px; border-radius: 15px; border: 3px solid var(--neon-red); box-shadow: 0 0 15px var(--neon-red); background: #000; }
+        .download-btn { display: inline-block; background: none; border: 2px solid var(--neon-white); color: var(--neon-white); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="logo-circle">
-            <img src="logo.jpg" alt="FastReel" onerror="this.style.display='none';">
-            <span class="fr-text" id="fr-fallback">FR</span> 
+            <span class="fr-text">FR</span> 
         </div>
         
         <h1>FastReel</h1>
-        <p>YouTube videosunu en iyi yerinden kırpıp Shorts yapın.</p>
+        <p>YouTube videosunu Shorts'a dönüştürün.</p>
         
-        <div class="input-area">
-            <input type="text" id="urlInput" placeholder="YouTube linkini buraya yapıştır...">
-        </div>
-        
-        <div class="btn-container">
-            <button class="btn" onclick="startAI()">AI İLE KIRP VE DÖNÜŞTÜR</button>
-        </div>
+        <input type="text" id="urlInput" placeholder="YouTube linkini yapıştırın...">
+        <button class="btn" id="startBtn">AI İLE DÖNÜŞTÜR</button>
 
         <div class="ai-loader-container" id="aiLoader">
             <div class="ai-loader"></div>
-            <div class="ai-text" id="aiStatus">Yapay Zeka Analiz Ediyor... %0</div>
+            <div class="ai-text" id="aiStatus">Yapay Zeka Hazırlıyor...</div>
         </div>
 
         <div id="result-area">
-            <h3 style="color:var(--neon-white); text-shadow: 0 0 10px var(--neon-white);">Videon Hazır!</h3>
-            <div class="shorts-player">
-                <div class="neon-border-draw"></div>
-                <div class="video-placeholder-text">Shorts Videosu Önizlemesi</div>
-                <div style="color:var(--neon-red); font-weight:bold; font-size:1.2rem; margin-top:10px;">[DEMO]</div>
-            </div>
-            <button class="download-btn">Kırpılmış Videoyu İndir</button>
+            <h3 style="color:var(--neon-white);">Videon Hazır!</h3>
+            <video id="outVid" controls></video>
+            <br>
+            <a id="dlLink" class="download-btn" href="#" target="_blank">VİDEOYU İNDİR</a>
         </div>
     </div>
 
-    <script>
-        // Logo resmi yüklenirse yazıyı gizle
-        window.onload = function() {
-            var img = document.querySelector('.logo-circle img');
-            var text = document.getElementById('fr-fallback');
-            if (img && img.complete && img.naturalWidth !== 0) { text.style.display = 'none'; }
-            img.onload = function() { text.style.display = 'none'; };
-        };
+    <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@0.1.4/dist/index.min.js";
 
-        function startAI() {
-            var url = document.getElementById('urlInput').value;
-            if(url === "" || (!url.includes("youtube.com") && !url.includes("youtu.be"))) { alert("Lütfen geçerli bir YouTube linki yapıştırın!"); return; }
-            
-            var loader = document.getElementById('aiLoader');
-            var statusText = document.getElementById('aiStatus');
-            var resultArea = document.getElementById('result-area');
-            
-            // Yükleme ekranını göster, eski sonucu gizle
+        const btn = document.getElementById('startBtn');
+        const urlInput = document.getElementById('urlInput');
+        const loader = document.getElementById('aiLoader');
+        const resultArea = document.getElementById('result-area');
+        const outVid = document.getElementById('outVid');
+        const dlLink = document.getElementById('dlLink');
+
+        btn.onclick = async () => {
+            const url = urlInput.value.trim();
+            if(!url) return alert("Lütfen bir link gir!");
+
             loader.style.display = "flex";
             resultArea.style.display = "none";
+            btn.disabled = true;
 
-            var count = 0;
-            var interval = setInterval(function() {
-                count += Math.floor(Math.random() * 8) + 1;
-                if(count >= 100) {
-                    count = 100;
-                    statusText.innerText = "Yapay Zeka Analiz Ediyor... %" + count;
-                    clearInterval(interval);
+            try {
+                // GERÇEK MOTOR BAĞLANTISI
+                const client = await Client.connect("FasttReel/FastReel-Backend");
+                const res = await client.predict("/predict", [url]);
+
+                if (res.data && res.data[0]) {
+                    const videoUrl = res.data[0].url;
+                    outVid.src = videoUrl;
+                    dlLink.href = videoUrl;
                     
-                    // İşlem bitti, yükleme ekranını gizle, sonucu göster
-                    setTimeout(function(){
-                        loader.style.display = "none";
-                        resultArea.style.display = "block";
-                        // Videoyu gösterdiğimiz alana yumuşak geçiş yap
-                        resultArea.scrollIntoView({ behavior: 'smooth' });
-                    }, 500);
-
-                } else {
-                    statusText.innerText = "Yapay Zeka Analiz Ediyor... %" + count;
+                    loader.style.display = "none";
+                    resultArea.style.display = "block";
                 }
-            }, 300);
-        }
+            } catch (e) {
+                alert("Hata: " + e.message);
+                loader.style.display = "none";
+            } finally {
+                btn.disabled = false;
+            }
+        };
     </script>
-
 </body>
 </html>
